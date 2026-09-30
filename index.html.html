@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bendahara Malang: Petualangan Keuangan Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- MathJax for rendering LaTeX math formulas -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: { fontCache: 'global' }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .math-font {
+            font-family: 'STIX Two Text', 'Times New Roman', serif;
+        }
+        .math-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            border-left: 4px solid #0284c7;
+        }
+        .mjx-chtml {
+            font-size: 110% !important;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #0284c7;
+            color: #0284c7;
+            font-weight: 700;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Navbar Sticky -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('landingView')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-coins text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white leading-tight">Bendahara Malang</h1>
+                        <p class="text-[10px] text-sky-400 font-medium">Petualangan Keuangan Digital</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Buttons -->
+                <nav class="hidden md:flex items-center space-x-1 text-xs font-semibold">
+                    <button onclick="switchView('landingView')" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-house text-sky-400"></i> Beranda
+                    </button>
+                    <button onclick="switchView('materialView')" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-open text-sky-400"></i> Materi
+                    </button>
+                    <button onclick="switchView('diagnosticSetupView')" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-check text-sky-400"></i> Tes Pemahaman Awal
+                    </button>
+                    <button onclick="switchView('groupSetupView')" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-users text-sky-400"></i> Misi Kelompok
+                    </button>
+                    <button onclick="openSimulatorModal()" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-calculator"></i> Simulator
+                    </button>
+                    <button onclick="switchView('teacherDashboardView')" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition text-amber-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-tie"></i> Panel Guru
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-300 hover:bg-slate-800">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-800 bg-slate-900 px-4 pt-2 pb-4 space-y-2 text-xs font-semibold">
+            <button onclick="switchView('landingView'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-house text-sky-400"></i> Beranda
+            </button>
+            <button onclick="switchView('materialView'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-sky-400"></i> Ringkasan Materi
+            </button>
+            <button onclick="switchView('diagnosticSetupView'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-user-check text-sky-400"></i> Tes Pemahaman Awal (Individual)
+            </button>
+            <button onclick="switchView('groupSetupView'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-users text-sky-400"></i> Misi Kelompok (3 Kasus)
+            </button>
+            <button onclick="openSimulatorModal(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg bg-emerald-600 text-white font-bold flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> Buka Simulator Canvas
+            </button>
+            <button onclick="switchView('teacherDashboardView'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-user-tie"></i> Panel Data Guru
+            </button>
+        </div>
+    </header>
+
+    <!-- Modal Notifications -->
+    <div id="customNotifyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl transform transition-all">
+            <div id="notifyIconContainer" class="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto">
+                <i id="notifyIcon" class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="notifyTitle" class="text-lg font-bold text-slate-800">Notifikasi</h3>
+            <p id="notifyMessage" class="text-xs text-slate-600 leading-relaxed"></p>
+            <div id="notifyActions" class="flex justify-center gap-2 pt-2">
+                <button onclick="closeNotifyModal()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- Landing View -->
+        <section id="landingView" class="space-y-8">
+            <div class="bg-gradient-to-br from-slate-900 via-sky-900 to-indigo-950 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 opacity-10 text-white pointer-events-none">
+                    <i class="fa-solid fa-landmark text-[280px]"></i>
+                </div>
+                <div class="max-w-2xl relative z-10 space-y-6">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight">Kelola Keuangan Usaha Lokal Kota Malang!</h2>
+                    <p class="text-sky-100 text-sm sm:text-base leading-relaxed">
+                        Selamat datang calon Bendahara Digital! Pelajari konsep <strong>Bunga Tunggal</strong>, <strong>Bunga Majemuk</strong>, dan <strong>Anuitas</strong> yang diterapkan langsung pada konteks potensi lokal Malang: Sentra Tempe Sanan, Agrowisata Apel Bumiaji Batu, dan Cagar Budaya Kayutangan Heritage.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchView('materialView')" class="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold rounded-xl shadow-lg hover:shadow-amber-400/20 transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>1. Pelajari Ringkasan Materi</span>
+                        </button>
+                        <button onclick="switchView('diagnosticSetupView')" class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold rounded-xl shadow-lg hover:shadow-emerald-500/20 transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-circle-play"></i>
+                            <span>2. Mulai Tes Pemahaman Awal</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Bunga Tunggal</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">Pemahaman bunga yang dihitung konstan berdasarkan modal awal. Penerapan pada Sentra Industri Keripik Tempe Sanan.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Bunga Majemuk</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">Konsep "bunga berbunga" di mana bunga dihitung dari saldo terakumulasi. Penerapan pada Agrowisata Apel Bumiaji Batu.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Anuitas & Pelunasan</h3>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">Cicilan tetap berkala gabungan angsuran pokok dan bunga. Penerapan pada restorasi Kayutangan Heritage.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Material View -->
+        <section id="materialView" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-sky-600"></i> Modul Pembelajaran Keuangan Digital Malang
+                    </h2>
+                    <p class="text-slate-600 text-sm">Pelajari konsep rumus dan contoh soal kontekstual sebelum mengambil tes pemahaman awal.</p>
+                </div>
+                <button onclick="switchView('diagnosticSetupView')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow transition flex items-center gap-2 text-xs">
+                    <span>Mulai Tes Pemahaman Awal</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Material Tabs Nav -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="flex border-b border-slate-200 overflow-x-auto bg-slate-50">
+                    <button onclick="showMaterialTab('tunggal')" id="tab-tunggal" class="tab-btn active px-6 py-4 font-semibold text-sm whitespace-nowrap flex items-center gap-2">
+                        <i class="fa-solid fa-store text-sky-600"></i> 1. Bunga Tunggal (Sanan)
+                    </button>
+                    <button onclick="showMaterialTab('majemuk')" id="tab-majemuk" class="tab-btn px-6 py-4 font-semibold text-slate-600 text-sm whitespace-nowrap flex items-center gap-2">
+                        <i class="fa-solid fa-tree text-emerald-600"></i> 2. Bunga Majemuk (Bumiaji)
+                    </button>
+                    <button onclick="showMaterialTab('anuitas')" id="tab-anuitas" class="tab-btn px-6 py-4 font-semibold text-slate-600 text-sm whitespace-nowrap flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns text-purple-600"></i> 3. Anuitas (Kayutangan)
+                    </button>
+                </div>
+
+                <div class="p-6 sm:p-8">
+                    <!-- Tab 1: Bunga Tunggal -->
+                    <div id="content-tunggal" class="space-y-6">
+                        <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-xl">
+                            <h3 class="font-bold text-lg text-sky-950">A. Konsep & Rumus Bunga Tunggal</h3>
+                            <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">
+                                <strong>Bunga Tunggal</strong> adalah bunga yang dihitung hanya berdasarkan modal awal ($M_0$) yang dipinjamkan atau diinvestasikan. Nilai bunga tetap sama setiap periode.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600">Rumus Utama Bunga Tunggal:</h4>
+                                <div class="bg-white p-3 rounded-lg border text-sm font-mono text-slate-900 space-y-1">
+                                    <p>• Bunga ($B$) = $M_0 \times i \times n$</p>
+                                    <p>• Modal Akhir ($M_n$) = $M_0(1 + i \times n)$</p>
+                                </div>
+                                <p class="text-xs text-slate-500">Keterangan: $M_0$ = Modal Awal, $i$ = Suku Bunga per periode, $n$ = Jangka Waktu.</p>
+                            </div>
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Konversi Periode Waktu ($n$):
+                                </h4>
+                                <ul class="space-y-1 text-xs text-amber-900">
+                                    <li>• Waktu dlm Bulan: $n = \frac{b}{12}$ tahun</li>
+                                    <li>• Waktu dlm Hari: $n = \frac{h}{365}$ tahun</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Contoh Soal Kontekstual Sanan -->
+                        <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-4 shadow-sm">
+                            <span class="px-2.5 py-1 bg-sky-100 text-sky-800 font-bold text-xs rounded-md uppercase">Contoh Soal Kontekstual Malang</span>
+                            <h4 class="font-bold text-slate-800">Kasus: Pemutakhiran Mesin Sentra Keripik Tempe Sanan</h4>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Pengusaha UMKM Keripik Tempe Sanan meminjam modal dari koperasi sebesar <strong>Rp 20.000.000,00</strong> dengan sistem bunga tunggal <strong>6% per tahun</strong>. Pinjaman tersebut akan dilunasi dalam waktu <strong>18 bulan</strong>. Berapakah total uang yang harus dikembalikan?
+                            </p>
+                            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs sm:text-sm font-mono space-y-1.5 overflow-x-auto">
+                                <p class="text-amber-400 font-bold">// Step-by-Step Pembahasan:</p>
+                                <p>1. Diketahui: M0 = 20.000.000, i = 6% = 0,06/tahun, n = 18/12 = 1,5 tahun</p>
+                                <p>2. Besar Bunga (B): B = M0 × i × n</p>
+                                <p class="pl-4">B = 20.000.000 × 0,06 × 1,5 = <span class="text-emerald-400">Rp 1.800.000,00</span></p>
+                                <p>3. Total Pelunasan (Mn): Mn = M0 + B</p>
+                                <p class="pl-4">Mn = 20.000.000 + 1.800.000 = <span class="text-emerald-400 font-bold">Rp 21.800.000,00</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Bunga Majemuk -->
+                    <div id="content-majemuk" class="hidden space-y-6">
+                        <div class="bg-emerald-50 border-l-4 border-emerald-600 p-4 rounded-r-xl">
+                            <h3 class="font-bold text-lg text-emerald-950">B. Konsep & Rumus Bunga Majemuk</h3>
+                            <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">
+                                <strong>Bunga Majemuk</strong> (Bunga Berbunga) dihitung berdasarkan modal awal ditambah akumulasi bunga periode sebelumnya. Total modal bertumbuh secara eksponensial.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600">Rumus Utama Bunga Majemuk:</h4>
+                                <div class="bg-white p-3 rounded-lg border text-sm font-mono text-slate-900 space-y-1">
+                                    <p>• Modal Akhir ($M_n$) = $M_0(1 + i)^n$</p>
+                                    <p>• Total Bunga ($B_n$) = $M_n - M_0$</p>
+                                </div>
+                                <p class="text-xs text-slate-500">Keterangan: $n$ = Jumlah periode pembungaan, $i$ = Suku bunga per periode.</p>
+                            </div>
+                            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-emerald-900">Pembungaan Sub-Periode:</h4>
+                                <p class="text-xs text-emerald-900 leading-relaxed">
+                                    Jika dikomposisikan $m$ kali dalam setahun (misal semester/caturwulan):
+                                    <br><span class="font-mono bg-white px-2 py-1 rounded mt-1 inline-block text-slate-800">$M_n = M_0(1 + \frac{i}{m})^{n \cdot m}$</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Contoh Soal Kontekstual Bumiaji -->
+                        <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-4 shadow-sm">
+                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-md uppercase">Contoh Soal Kontekstual Malang</span>
+                            <h4 class="font-bold text-slate-800">Kasus: Investasi Lahan Agrowisata Apel Bumiaji Batu</h4>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Petani Agrowisata Apel Bumiaji menanamkan modal investasi kebun sebesar <strong>Rp 50.000.000,00</strong> dengan suku bunga majemuk <strong>4% per tahun</strong>. Berapakah nilai tabungan investasi setelah <strong>3 tahun</strong>?
+                            </p>
+                            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs sm:text-sm font-mono space-y-1.5 overflow-x-auto">
+                                <p class="text-amber-400 font-bold">// Step-by-Step Pembahasan:</p>
+                                <p>1. Diketahui: M0 = 50.000.000, i = 4% = 0,04, n = 3 tahun</p>
+                                <p>2. Modal Akhir (M3): M3 = M0 × (1 + i)^3</p>
+                                <p class="pl-4">M3 = 50.000.000 × (1,04)^3</p>
+                                <p class="pl-4">M3 = 50.000.000 × 1,124864 = <span class="text-emerald-400 font-bold">Rp 56.243.200,00</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Anuitas -->
+                    <div id="content-anuitas" class="hidden space-y-6">
+                        <div class="bg-purple-50 border-l-4 border-purple-600 p-4 rounded-r-xl">
+                            <h3 class="font-bold text-lg text-purple-950">C. Konsep & Rumus Anuitas</h3>
+                            <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">
+                                <strong>Anuitas ($A$)</strong> adalah jumlah cicilan tetap yang dibayarkan secara berkala. Terdiri dari dua komponen utama: <strong>Angsuran Pokok ($a_n$)</strong> dan <strong>Bunga ($b_n$)</strong>.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600">Rumus Anuitas:</h4>
+                                <div class="bg-white p-3 rounded-lg border text-xs font-mono text-slate-900 space-y-1">
+                                    <p>• $A = a_n + b_n$ (Nilai A Tetap)</p>
+                                    <p>• $A = \frac{M \times i}{1 - (1 + i)^{-n}}$</p>
+                                    <p>• $b_1 = M_0 \times i \quad \Rightarrow \quad a_1 = A - b_1$</p>
+                                </div>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-2">
+                                <h4 class="font-bold text-xs uppercase tracking-wider text-purple-900">Hubungan Antar Angsuran:</h4>
+                                <p class="text-xs text-purple-900 leading-relaxed">
+                                    Angsuran pokok ke-$n$ ($a_n$) bertambah secara eksponensial:
+                                    <br><span class="font-mono bg-white px-2 py-1 rounded mt-1 inline-block text-slate-800">$a_n = a_1(1 + i)^{n-1}$</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Contoh Soal Kontekstual Kayutangan -->
+                        <div class="border border-slate-200 rounded-xl p-5 bg-white space-y-4 shadow-sm">
+                            <span class="px-2.5 py-1 bg-purple-100 text-purple-800 font-bold text-xs rounded-md uppercase">Contoh Soal Kontekstual Malang</span>
+                            <h4 class="font-bold text-slate-800">Kasus: Restorasi Kafe Kayutangan Heritage</h4>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Pinjaman renovasi kafe sebesar <strong>Rp 10.000.000,00</strong> dilunasi dengan anuitas tahunan sebesar <strong>Rp 3.862.890,00</strong> dengan bunga <strong>8% per tahun</strong>. Hitung komponen pembayaran tahun pertama!
+                            </p>
+                            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs sm:text-sm font-mono space-y-1.5 overflow-x-auto">
+                                <p class="text-amber-400 font-bold">// Step-by-Step Pembahasan Tahun 1:</p>
+                                <p>1. Bunga Thn-1 (b1): b1 = 10.000.000 × 0,08 = Rp 800.000,00</p>
+                                <p>2. Angsuran Pokok Thn-1 (a1): a1 = A - b1 = 3.862.890 - 800.000 = Rp 3.062.890,00</p>
+                                <p>3. Sisa Pinjaman Thn-1 (S1): S1 = M0 - a1 = 10.000.000 - 3.062.890 = <span class="text-emerald-400 font-bold">Rp 6.937.110,00</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diagnostic Setup View -->
+        <section id="diagnosticSetupView" class="hidden max-w-xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-inner">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Fase 1: Tes Pemahaman Awal</h2>
+                    <p class="text-slate-500 text-xs sm:text-sm">Isi profil siswa dan kerjakan 5 soal pemahaman awal konsep Bunga Tunggal, Bunga Majemuk, dan Anuitas.</p>
+                </div>
+
+                <form onsubmit="startDiagnosticQuiz(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nama Lengkap Siswa</label>
+                        <input type="text" id="studentNameInput" required placeholder="Contoh: Budi Pratama" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Pilih Avatar Bendahara</label>
+                        <div class="grid grid-cols-4 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="avatar" value="fa-user-ninja" checked class="peer hidden">
+                                <div class="p-3 border-2 border-slate-200 rounded-xl text-center peer-checked:border-sky-600 peer-checked:bg-sky-50 text-2xl text-slate-600 transition">
+                                    <i class="fa-solid fa-user-ninja"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="avatar" value="fa-user-tie" class="peer hidden">
+                                <div class="p-3 border-2 border-slate-200 rounded-xl text-center peer-checked:border-sky-600 peer-checked:bg-sky-50 text-2xl text-slate-600 transition">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="avatar" value="fa-user-astronaut" class="peer hidden">
+                                <div class="p-3 border-2 border-slate-200 rounded-xl text-center peer-checked:border-sky-600 peer-checked:bg-sky-50 text-2xl text-slate-600 transition">
+                                    <i class="fa-solid fa-user-astronaut"></i>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="avatar" value="fa-user-graduate" class="peer hidden">
+                                <div class="p-3 border-2 border-slate-200 rounded-xl text-center peer-checked:border-sky-600 peer-checked:bg-sky-50 text-2xl text-slate-600 transition">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg transition text-sm">
+                        Mulai Tes Pemahaman Awal
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Diagnostic Quiz View -->
+        <section id="diagnosticQuizView" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <!-- Quiz Header Status -->
+                <div class="flex justify-between items-center border-b pb-4">
+                    <div class="flex items-center gap-3">
+                        <div id="diagAvatarDisplay" class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600 font-bold text-lg"></div>
+                        <div>
+                            <p id="diagStudentNameDisplay" class="font-bold text-sm text-slate-800"></p>
+                            <p class="text-[11px] text-slate-400">Tes Pemahaman Awal Concept</p>
+                        </div>
+                    </div>
+                    <span id="diagProgressDisplay" class="px-3 py-1 bg-sky-100 text-sky-800 font-extrabold text-xs rounded-full">Soal 1 / 5</span>
+                </div>
+
+                <!-- Soal Dynamic Container -->
+                <div id="diagQuestionContainer" class="space-y-4"></div>
+
+                <div class="flex justify-between items-center pt-4 border-t">
+                    <button onclick="prevDiagQuestion()" id="diagPrevBtn" class="px-4 py-2.5 border rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition">Kembali</button>
+                    <button onclick="nextDiagQuestion()" id="diagNextBtn" class="px-6 py-2.5 bg-sky-600 text-white rounded-xl text-xs font-extrabold hover:bg-sky-500 transition">Lanjut</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diagnostic Result View -->
+        <section id="diagnosticResultView" class="hidden max-w-xl mx-auto space-y-6 text-center">
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-extrabold text-slate-800">Hasil Pemahaman Awal</h2>
+                    <p id="diagResultName" class="text-slate-600 font-semibold text-sm"></p>
+                </div>
+
+                <div class="p-6 bg-slate-50 rounded-2xl border space-y-2">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Skor Pemahaman</p>
+                    <p id="diagResultScore" class="text-4xl font-extrabold text-sky-600">0 / 5</p>
+                    <div id="diagResultBadge" class="inline-block px-4 py-1 rounded-full text-xs font-extrabold uppercase mt-2"></div>
+                </div>
+
+                <div id="diagResultDescription" class="text-xs text-slate-600 leading-relaxed text-left bg-sky-50 p-4 rounded-xl border border-sky-100"></div>
+
+                <button onclick="switchView('groupSetupView')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                    <span>Lanjut ke Fase 2: Pembentukan Kelompok Misi</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Group Setup View -->
+        <section id="groupSetupView" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-inner">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Fase 2: Pembentukan Kelompok</h2>
+                    <p class="text-slate-500 text-xs sm:text-sm">Bentuk tim (4-5 siswa) dan pilih tingkat tantangan misi kelompok berdasarkan hasil diskusi bersama.</p>
+                </div>
+
+                <form onsubmit="startGroupMissions(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nama Kelompok</label>
+                        <input type="text" id="groupNameInput" required placeholder="Contoh: Tim Bendahara Sanan" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Pilih Level Kelompok (Hasil Diskusimu)</label>
+                        <select id="groupLevelSelect" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none bg-white text-sm">
+                            <option value="C">Level C (Pemula - Langkah Terpandu Step-by-Step)</option>
+                            <option value="B">Level B (Menengah - Variasi Konversi Waktu)</option>
+                            <option value="A">Level A (Mahir - Analisis Kritis Multi-Step)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Daftar Anggota Tim</label>
+                        <input type="text" id="member1Input" required placeholder="Anggota 1 (Wajib)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none">
+                        <input type="text" id="member2Input" required placeholder="Anggota 2 (Wajib)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none">
+                        <input type="text" id="member3Input" required placeholder="Anggota 3 (Wajib)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none">
+                        <input type="text" id="member4Input" required placeholder="Anggota 4 (Wajib)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none">
+                        <input type="text" id="member5Input" placeholder="Anggota 5 (Opsional)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl shadow-lg transition text-sm">
+                        Mulai Misi Kelompok (3 Tantangan Malang)
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Group Mission View -->
+        <section id="groupMissionView" class="hidden space-y-6">
+            <!-- Group Info Card -->
+            <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-xl flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span id="groupLevelBadge" class="px-2.5 py-0.5 rounded text-xs font-extrabold uppercase bg-amber-400 text-slate-900">LEVEL A</span>
+                        <h2 id="groupNameDisplay" class="text-xl font-extrabold"></h2>
+                    </div>
+                    <p id="groupMembersDisplay" class="text-xs text-slate-400 mt-1"></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] uppercase font-bold text-slate-400">Skor Misi Tim</p>
+                    <p id="groupCurrentScore" class="text-2xl font-extrabold text-emerald-400">0 Pts</p>
+                </div>
+            </div>
+
+            <!-- Mission Container -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <span id="missionTag" class="px-3 py-1 bg-sky-100 text-sky-800 font-extrabold text-xs rounded-full">MISI 1 DARI 3</span>
+                    <button onclick="openSimulatorModal()" class="text-xs text-emerald-600 font-bold hover:underline flex items-center gap-1.5">
+                        <i class="fa-solid fa-calculator"></i> Buka Canvas Simulator
+                    </button>
+                </div>
+
+                <div id="missionBodyContainer" class="space-y-6"></div>
+
+                <div class="flex justify-between items-center pt-4 border-t">
+                    <button onclick="submitMissionAnswer()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl shadow transition text-sm">
+                        Kirim Jawaban Misi Tim
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificate View -->
+        <section id="certificateView" class="hidden space-y-6">
+            <div class="no-print space-y-4 max-w-3xl mx-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-handshake-angle text-emerald-600"></i> Refleksi Kebudayaan Gotong Royong Malang
+                    </h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Nilai gotong royong dan musyawarah adalah kebanggaan warga Malang. Bagaimana tim kalian bekerjasama memecahkan kasus keuangan ini?
+                    </p>
+                    <textarea id="reflectionInput" rows="3" placeholder="Tuliskan pengalaman kerjasama kelompokmu di sini..." class="w-full p-3 text-xs sm:text-sm rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button onclick="window.print()" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow transition flex items-center gap-2 text-xs">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak / Simpan PDF Sertifikat</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Printable Certificate -->
+            <div id="certificateCard" class="bg-white p-8 sm:p-12 rounded-3xl border-8 border-sky-950 shadow-2xl max-w-3xl mx-auto space-y-8 relative overflow-hidden">
+                <div class="absolute right-4 top-4 opacity-5 pointer-events-none">
+                    <i class="fa-solid fa-award text-[220px]"></i>
+                </div>
+
+                <div class="text-center space-y-2 border-b-2 border-slate-200 pb-6">
+                    <p class="text-xs font-bold uppercase tracking-widest text-sky-600">SERTIFIKAT LITERASI KEUANGAN DIGITAL</p>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Bendahara Muda Malang</h2>
+                    <p class="text-xs text-slate-500">Telah Berhasil Menyelesaikan Tantangan Keuangan Berbasis Budaya Malang</p>
+                </div>
+
+                <div class="space-y-6 text-center">
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold">Diberikan Kepada Kelompok:</p>
+                        <h3 id="certGroupName" class="text-2xl font-extrabold text-sky-950 mt-1"></h3>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold mb-1">Anggota Tim:</p>
+                        <p id="certMembers" class="text-sm font-semibold text-slate-700"></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 max-w-md mx-auto pt-2">
+                        <div class="bg-slate-50 p-4 rounded-xl border">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Level Tantangan</p>
+                            <p id="certLevel" class="text-base font-bold text-slate-800"></p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Skor Misi Tim</p>
+                            <p id="certScore" class="text-base font-bold text-emerald-600"></p>
+                        </div>
+                    </div>
+
+                    <div class="text-left bg-slate-50 p-4 rounded-xl border text-xs text-slate-600 space-y-1">
+                        <p class="font-bold text-slate-800">Catatan Refleksi Gotong Royong:</p>
+                        <p id="certReflectionDisplay" class="italic text-slate-500">"Saling membantu dan bermusyawarah dalam memecahkan masalah keuangan lokal."</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end pt-8 border-t border-slate-200 text-xs text-slate-500">
+                    <div>
+                        <p>Kota Malang, Jawa Timur</p>
+                        <p class="font-bold text-slate-700 mt-0.5">Program Bendahara Digital</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-24 border-b border-slate-400 mb-1"></div>
+                        <p class="font-bold text-slate-700">Verifikasi Sistem</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teacher Dashboard View -->
+        <section id="teacherDashboardView" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-user-tie text-amber-500"></i> Panel Data Guru (Teacher Dashboard)
+                    </h2>
+                    <p class="text-slate-500 text-xs sm:text-sm">Rekapitulasi otomatis data hasil tes pemahaman awal & performa siswa.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="copyTeacherData()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Salin Data Rekap</span>
+                    </button>
+                    <button onclick="clearTeacherData()" class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold rounded-xl transition">
+                        Reset Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b font-bold text-xs sm:text-sm text-slate-700">Data Hasil Tes Pemahaman Awal Siswa</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-[11px] uppercase font-bold text-slate-500">
+                            <tr>
+                                <th class="p-4">No</th>
+                                <th class="p-4">Nama Siswa</th>
+                                <th class="p-4">Skor (x/5)</th>
+                                <th class="p-4">Hasil Level</th>
+                                <th class="p-4">Waktu Tes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Simulator Modal -->
+    <div id="simulatorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 max-h-[92vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="font-bold text-lg sm:text-xl text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-area text-emerald-600"></i> Simulator Canvas Perbandingan Keuangan
+                </h3>
+                <button onclick="closeSimulatorModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 font-bold flex items-center justify-center">&times;</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <label class="font-bold text-slate-700">Modal Awal (Rp)</label>
+                    <input type="number" id="simModalInput" value="10000000" step="1000000" class="w-full p-2.5 border border-slate-300 rounded-xl mt-1 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700">Suku Bunga / Thn (%)</label>
+                    <input type="number" id="simRateInput" value="10" min="1" max="50" class="w-full p-2.5 border border-slate-300 rounded-xl mt-1 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700">Jangka Waktu (Tahun)</label>
+                    <input type="number" id="simYearsInput" value="5" min="1" max="10" class="w-full p-2.5 border border-slate-300 rounded-xl mt-1 outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+
+            <button onclick="updateSimulatorCanvas()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate"></i> Hitung & Visualisasikan Grafik Canvas
+            </button>
+
+            <!-- Visual Canvas Container -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                <canvas id="simCanvas" class="w-full h-64 rounded-lg block"></canvas>
+            </div>
+
+            <div class="flex justify-center gap-6 text-xs font-bold">
+                <span class="flex items-center gap-2 text-sky-400">
+                    <span class="w-3 h-3 bg-sky-500 inline-block rounded-full"></span> Bunga Tunggal
+                </span>
+                <span class="flex items-center gap-2 text-emerald-400">
+                    <span class="w-3 h-3 bg-emerald-500 inline-block rounded-full"></span> Bunga Majemuk
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // State Management
+        let currentStudent = { name: '', avatar: 'fa-user-ninja', score: 0, level: 'C' };
+        let currentDiagIndex = 0;
+        let selectedDiagAnswers = {};
+        let currentGroup = { name: '', level: 'C', members: [], score: 0, currentMissionIndex: 0, reflection: '' };
+
+        // Custom Notification Handler
+        function showNotify(title, message, iconClass = 'fa-circle-info', iconBg = 'bg-blue-100 text-blue-600') {
+            document.getElementById('notifyTitle').textContent = title;
+            document.getElementById('notifyMessage').textContent = message;
+            const container = document.getElementById('notifyIconContainer');
+            container.className = `w-14 h-14 rounded-full flex items-center justify-center text-2xl mx-auto ${iconBg}`;
+            document.getElementById('notifyIcon').className = `fa-solid ${iconClass}`;
+            document.getElementById('customNotifyModal').classList.remove('hidden');
+        }
+
+        function closeNotifyModal() {
+            document.getElementById('customNotifyModal').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Diagnostic Questions Dataset (Fokus Pemahaman Awal: Bunga Tunggal, Bunga Majemuk, & Anuitas)
+        const diagQuestions = [
+            {
+                id: 1,
+                category: "Bunga Tunggal",
+                question: "Koperasi Sentra Keripik Tempe Sanan menawarkan pinjaman usaha menggunakan sistem Bunga Tunggal. Apakah ciri khas paling utama dari sistem Bunga Tunggal tersebut?",
+                options: [
+                    "Besarnya bunga dihitung dari modal awal dan bernilai tetap di setiap periode.",
+                    "Bunga dihitung dari modal ditambah dengan akumulasi bunga periode sebelumnya.",
+                    "Besarnya suku bunga bertambah secara eksponensial seiring bertambahnya waktu.",
+                    "Bunga hanya wajib dibayarkan satu kali pada akhir masa pelunasan pinjaman."
+                ],
+                correct: 0
+            },
+            {
+                id: 2,
+                category: "Bunga Tunggal",
+                question: "Pengrajin tempe Sanan meminjam modal awal $M_0 = \\text{Rp } 10.000.000,00$ dengan suku bunga tunggal $5\\%$ per tahun. Berapakah besar bunga yang harus dibayarkan setelah $1$ tahun?",
+                options: [
+                    "Rp 250.000,00",
+                    "Rp 500.000,00",
+                    "Rp 750.000,00",
+                    "Rp 1.000.000,00"
+                ],
+                correct: 1
+            },
+            {
+                id: 3,
+                category: "Bunga Majemuk",
+                question: "Petani Agrowisata Apel Bumiaji Batu menabung modal pengembangan kebun dengan Bunga Majemuk. Pernyataan manakah yang paling tepat menggambarkan prinsip Bunga Majemuk?",
+                options: [
+                    "Bunga bernilai konstan karena hanya dihitung dari simpanan awal.",
+                    "Bunga dihitung dari modal awal ditambah akumulasi bunga periode sebelumnya (bunga berbunga).",
+                    "Bunga majemuk selalu menghasilkan total modal yang lebih kecil dibanding bunga tunggal.",
+                    "Pokok simpanan awal berkurang secara otomatis setiap kali periode pembungaan."
+                ],
+                correct: 1
+            },
+            {
+                id: 4,
+                category: "Anuitas",
+                question: "Pengelola Kafe Kayutangan Heritage melakukan peminjaman renovasi dengan sistem Anuitas ($A$). Dalam sistem anuitas, setiap pembayaran cicilan berkala terdiri dari dua komponen utama, yaitu...",
+                options: [
+                    "Modal Awal dan Bunga Majemuk",
+                    "Angsuran Pokok ($a_t$) dan Bunga ($b_t$)",
+                    "Denda Keterlambatan dan Biaya Administrasi",
+                    "Bunga Tunggal dan Bunga Berbunga"
+                ],
+                correct: 1
+            },
+            {
+                id: 5,
+                category: "Anuitas",
+                question: "Kafe Kayutangan membayar anuitas bulanan sebesar $\\text{Rp } 1.500.000,00$. Jika bunga pada bulan pertama ($b_1$) dihitung sebesar $\\text{Rp } 400.000,00$, berapakah besar angsuran pokok pertamanya ($a_1$)?",
+                options: [
+                    "Rp 1.100.000,00",
+                    "Rp 1.500.000,00",
+                    "Rp 1.900.000,00",
+                    "Rp 600.000,00"
+                ],
+                correct: 0
+            }
+        ];
+
+        // Group Missions Data
+        const groupMissionsData = {
+            'C': [
+                {
+                    title: "Misi 1: Bunga Tunggal - Sentra Tempe Sanan Malang",
+                    context: "Koperasi Sentra Keripik Tempe Sanan memberikan pinjaman pemulihan usaha sebesar Rp 10.000.000,00 dengan bunga tunggal 5% per tahun selama 2 tahun.",
+                    question: "Berapakah total bunga yang harus dibayarkan pengrajin tempe Sanan setelah 2 tahun?",
+                    options: ["Rp 500.000,00", "Rp 1.000.000,00", "Rp 1.500.000,00", "Rp 11.000.000,00"],
+                    correct: 1,
+                    explanation: "B = M0 × i × n = 10.000.000 × 0,05 × 2 = Rp 1.000.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 2: Bunga Majemuk - Agrowisata Apel Bumiaji Batu",
+                    context: "Kelompok Tani Apel Bumiaji menabung dana pupuk Rp 5.000.000,00 dengan bunga majemuk 10% per tahun.",
+                    question: "Berapa total tabungan pada akhir tahun ke-2?",
+                    options: ["Rp 5.500.000,00", "Rp 6.000.000,00", "Rp 6.050.000,00", "Rp 6.100.000,00"],
+                    correct: 2,
+                    explanation: "M2 = 5.000.000 × (1,10)^2 = 5.000.000 × 1,21 = Rp 6.050.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 3: Anuitas - Kafe Kayutangan Heritage",
+                    context: "Pengelola kafe Cagar Budaya Kayutangan memiliki cicilan anuitas tetap Rp 2.000.000,00/bulan. Pada bulan ke-1, bunga dihitung Rp 500.000,00.",
+                    question: "Berapa besar angsuran pokok (a1) bulan ke-1?",
+                    options: ["Rp 1.500.000,00", "Rp 2.500.000,00", "Rp 1.000.000,00", "Rp 2.000.000,00"],
+                    correct: 0,
+                    explanation: "a1 = A - b1 = 2.000.000 - 500.000 = Rp 1.500.000,00.",
+                    pts: 100
+                }
+            ],
+            'B': [
+                {
+                    title: "Misi 1: Bunga Tunggal - Sentra Tempe Sanan Malang",
+                    context: "Pengrajin Tempe Sanan meminjam modal Rp 15.000.000,00 dengan bunga tunggal 8% per tahun selama 18 bulan.",
+                    question: "Berapakah total dana pelunasan (Modal + Total Bunga) yang harus dikembalikan?",
+                    options: ["Rp 16.200.000,00", "Rp 16.800.000,00", "Rp 17.400.000,00", "Rp 18.000.000,00"],
+                    correct: 1,
+                    explanation: "n = 18/12 = 1,5 thn. B = 15.000.000 × 0,08 × 1,5 = Rp 1.800.000. Total = Rp 16.800.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 2: Bunga Majemuk - Agrowisata Apel Bumiaji Batu",
+                    context: "Kelompok Tani Apel Bumiaji menabung dana pupuk Rp 5.000.000,00 dengan bunga majemuk 10% per tahun.",
+                    question: "Berapa total tabungan pada akhir tahun ke-2?",
+                    options: ["Rp 5.500.000,00", "Rp 6.000.000,00", "Rp 6.050.000,00", "Rp 6.100.000,00"],
+                    correct: 2,
+                    explanation: "M2 = 5.000.000 × (1,10)^2 = 5.000.000 × 1,21 = Rp 6.050.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 3: Anuitas - Kafe Kayutangan Heritage",
+                    context: "Pengelola kafe Cagar Budaya Kayutangan memiliki cicilan anuitas tetap Rp 2.000.000,00/bulan. Pada bulan ke-1, bunga dihitung Rp 500.000,00.",
+                    question: "Berapa besar angsuran pokok (a1) bulan ke-1?",
+                    options: ["Rp 1.500.000,00", "Rp 2.500.000,00", "Rp 1.000.000,00", "Rp 2.000.000,00"],
+                    correct: 0,
+                    explanation: "a1 = A - b1 = 2.000.000 - 500.000 = Rp 1.500.000,00.",
+                    pts: 100
+                }
+            ],
+            'B': [
+                {
+                    title: "Misi 1: Bunga Tunggal - Sentra Tempe Sanan Malang",
+                    context: "Pengrajin Tempe Sanan meminjam modal Rp 15.000.000,00 dengan bunga tunggal 8% per tahun selama 18 bulan.",
+                    question: "Berapakah total dana pelunasan (Modal + Total Bunga) yang harus dikembalikan?",
+                    options: ["Rp 16.200.000,00", "Rp 16.800.000,00", "Rp 17.400.000,00", "Rp 18.000.000,00"],
+                    correct: 1,
+                    explanation: "t = 18/12 = 1,5 thn. B = 15.000.000 × 0,08 × 1,5 = Rp 1.800.000. Total = Rp 16.800.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 2: Bunga Majemuk - Agrowisata Apel Bumiaji Batu",
+                    context: "Investasi kebun apel Bumiaji Rp 20.000.000,00 mendapatkan bunga majemuk 4% per semester. Berapa nilai investasi setelah 1,5 tahun (3 semester)?",
+                    question: "Berapakah nilai investasi pada akhir semester ke-3?",
+                    options: ["Rp 22.400.000,00", "Rp 22.497.280,00", "Rp 22.800.000,00", "Rp 23.000.000,00"],
+                    correct: 1,
+                    explanation: "M3 = 20.000.000 × (1,04)^3 = 20.000.000 × 1,124864 = Rp 22.497.280,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 3: Anuitas - Kafe Kayutangan Heritage",
+                    context: "Pinjaman renovasi gedung antik Kayutangan Rp 12.000.000,00 dilunasi dengan Anuitas Rp 4.200.000,00/tahun dengan bunga 10%/tahun.",
+                    question: "Berapakah sisa pinjaman pada akhir tahun pertama setelah pembayaran anuitas ke-1?",
+                    options: ["Rp 8.000.000,00", "Rp 9.000.000,00", "Rp 10.800.000,00", "Rp 7.800.000,00"],
+                    correct: 1,
+                    explanation: "b1 = 1.200.000, a1 = 4.200.000 - 1.200.000 = 3.000.000. Sisa S1 = 12.000.000 - 3.000.000 = Rp 9.000.000,00.",
+                    pts: 100
+                }
+            ],
+            'A': [
+                {
+                    title: "Misi 1: Bunga Tunggal - Sentra Tempe Sanan Malang",
+                    context: "Koperasi Sanan menawarkan dua skema pinjaman modal Rp 20.000.000,00: Skema 1 (Bunga tunggal 7%/tahun selama 2 tahun) dan Skema 2 (Bunga tunggal 0,6%/bulan selama 2 tahun).",
+                    question: "Berapakah selisih total bunga antara Skema 2 dan Skema 1?",
+                    options: ["Rp 80.000,00", "Rp 120.000,00", "Rp 200.000,00", "Rp 280.000,00"],
+                    correct: 0,
+                    explanation: "Skema 1 = 2.800.000. Skema 2 = 2.880.000. Selisih = Rp 80.000,00.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 2: Bunga Majemuk - Agrowisata Apel Bumiaji Batu",
+                    context: "Petani Bumiaji meminjam dana irigasi tetes Rp 30.000.000,00 dengan suku bunga majemuk 6% per tahun. Total pengembalian akhir Rp 35.730.480,00.",
+                    question: "Berapa tahunkah jangka waktu pinjaman tersebut?",
+                    options: ["2 Tahun", "3 Tahun", "4 Tahun", "5 Tahun"],
+                    correct: 1,
+                    explanation: "(1,06)^n = 35.730.480 / 30.000.000 = 1,191016 ⇒ n = 3 tahun.",
+                    pts: 100
+                },
+                {
+                    title: "Misi 3: Anuitas - Kafe Kayutangan Heritage",
+                    context: "Pinjaman restorasi Kayutangan Rp 20.000.000,00 dilunasi anuitas tahunan dengan bunga 8% per tahun. Diketahui angsuran pertama (a1) adalah Rp 4.500.000,00.",
+                    question: "Berapakah besar angsuran pokok ke-2 (a2)?",
+                    options: ["Rp 4.700.000,00", "Rp 4.860.000,00", "Rp 5.000.000,00", "Rp 5.200.000,00"],
+                    correct: 1,
+                    explanation: "a2 = a1 × (1+i) = 4.500.000 × 1,08 = Rp 4.860.000,00.",
+                    pts: 100
+                }
+            ]
+        };
+
+        function switchView(viewId) {
+            const views = [
+                'landingView', 'materialView', 'diagnosticSetupView', 
+                'diagnosticQuizView', 'diagnosticResultView', 'groupSetupView', 
+                'groupMissionView', 'certificateView', 'teacherDashboardView'
+            ];
+            
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.classList.remove('hidden');
+
+            if (viewId === 'teacherDashboardView') loadTeacherData();
+            
+            triggerMathJax();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch((err) => console.log('MathJax err:', err));
+            }
+        }
+
+        function showMaterialTab(tabName) {
+            ['tunggal', 'majemuk', 'anuitas'].forEach(t => {
+                const content = document.getElementById(`content-${t}`);
+                const tabBtn = document.getElementById(`tab-${t}`);
+                if (content) content.classList.add('hidden');
+                if (tabBtn) tabBtn.classList.remove('active');
+            });
+
+            const activeContent = document.getElementById(`content-${tabName}`);
+            const activeTabBtn = document.getElementById(`tab-${tabName}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeTabBtn) activeTabBtn.classList.add('active');
+
+            triggerMathJax();
+        }
+
+        function startDiagnosticQuiz(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('studentNameInput').value.trim();
+            const avatarInput = document.querySelector('input[name="avatar"]:checked').value;
+
+            if (!nameInput) return;
+
+            currentStudent.name = nameInput;
+            currentStudent.avatar = avatarInput;
+            currentStudent.score = 0;
+            currentDiagIndex = 0;
+            selectedDiagAnswers = {};
+
+            document.getElementById('diagStudentNameDisplay').textContent = currentStudent.name;
+            document.getElementById('diagAvatarDisplay').innerHTML = `<i class="fa-solid ${currentStudent.avatar}"></i>`;
+
+            switchView('diagnosticQuizView');
+            renderDiagQuestion();
+        }
+
+        function renderDiagQuestion() {
+            const q = diagQuestions[currentDiagIndex];
+            document.getElementById('diagProgressDisplay').textContent = `Soal ${currentDiagIndex + 1} / ${diagQuestions.length}`;
+
+            const container = document.getElementById('diagQuestionContainer');
+            let optionsHtml = q.options.map((opt, idx) => {
+                const isSelected = selectedDiagAnswers[currentDiagIndex] === idx;
+                return `
+                    <button type="button" onclick="selectDiagOption(${idx})" class="w-full text-left p-4 rounded-xl border-2 transition ${isSelected ? 'border-sky-600 bg-sky-50 font-bold text-sky-950' : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'}">
+                        <span class="inline-block w-6 h-6 text-center text-xs font-bold rounded-full mr-2 ${isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600'}">${String.fromCharCode(65 + idx)}</span>
+                        ${opt}
+                    </button>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="inline-block px-2.5 py-1 bg-sky-100 text-sky-800 text-[11px] font-extrabold rounded-md uppercase">
+                        ${q.category}
+                    </div>
+                    <h3 class="font-bold text-base sm:text-lg text-slate-800">${q.id}. ${q.question}</h3>
+                    <div class="space-y-2.5 font-sans">${optionsHtml}</div>
+                </div>
+            `;
+
+            document.getElementById('diagPrevBtn').style.visibility = currentDiagIndex === 0 ? 'hidden' : 'visible';
+            document.getElementById('diagNextBtn').textContent = currentDiagIndex === diagQuestions.length - 1 ? 'Selesai & Lihat Hasil' : 'Lanjut';
+
+            triggerMathJax();
+        }
+
+        function selectDiagOption(optIdx) {
+            selectedDiagAnswers[currentDiagIndex] = optIdx;
+            renderDiagQuestion();
+        }
+
+        function prevDiagQuestion() {
+            if (currentDiagIndex > 0) {
+                currentDiagIndex--;
+                renderDiagQuestion();
+            }
+        }
+
+        function nextDiagQuestion() {
+            if (selectedDiagAnswers[currentDiagIndex] === undefined) {
+                showNotify('Pilih Jawaban', 'Silakan pilih salah satu Opsi Jawaban terlebih dahulu.', 'fa-circle-exclamation', 'bg-amber-100 text-amber-600');
+                return;
+            }
+
+            if (currentDiagIndex < diagQuestions.length - 1) {
+                currentDiagIndex++;
+                renderDiagQuestion();
+            } else {
+                finishDiagnosticQuiz();
+            }
+        }
+
+        function finishDiagnosticQuiz() {
+            let correctCount = 0;
+            diagQuestions.forEach((q, idx) => {
+                if (selectedDiagAnswers[idx] === q.correct) correctCount++;
+            });
+
+            currentStudent.score = correctCount;
+            currentStudent.level = correctCount >= 4 ? 'A' : correctCount >= 2 ? 'B' : 'C';
+
+            saveTeacherData(currentStudent);
+
+            document.getElementById('diagResultName').textContent = `Selamat, ${currentStudent.name}!`;
+            document.getElementById('diagResultScore').textContent = `${currentStudent.score} / ${diagQuestions.length}`;
+
+            const badge = document.getElementById('diagResultBadge');
+            const desc = document.getElementById('diagResultDescription');
+
+            if (currentStudent.level === 'A') {
+                badge.className = "inline-block px-4 py-1 rounded-full text-xs font-extrabold uppercase mt-2 bg-emerald-100 text-emerald-800";
+                badge.textContent = "LEVEL A (MAHIR)";
+                desc.innerHTML = "<strong>Pemahaman Awal Sangat Baik:</strong> Kamu telah menguasai pemahaman awal tentang Bunga Tunggal, Bunga Majemuk, dan Anuitas dengan sangat solid! Kamu siap memimpin analisis kasus Level A pada kerja kelompok.";
+            } else if (currentStudent.level === 'B') {
+                badge.className = "inline-block px-4 py-1 rounded-full text-xs font-extrabold uppercase mt-2 bg-sky-100 text-sky-800";
+                badge.textContent = "LEVEL B (MENENGAH)";
+                desc.innerHTML = "<strong>Pemahaman Awal Baik:</strong> Pemahaman konsep dasar kamu cukup baik. Pertajam kembali pemahaman perbedaan bunga tunggal, majemuk, dan anuitas pada diskusi kelompok Level B!";
+            } else {
+                badge.className = "inline-block px-4 py-1 rounded-full text-xs font-extrabold uppercase mt-2 bg-amber-100 text-amber-800";
+                badge.textContent = "LEVEL C (PEMULA)";
+                desc.innerHTML = "<strong>Pemahaman Awal Perlu Ditingkatkan:</strong> Tetap semangat! Pelajari kembali penjelasan materi pada Modul dan manfaatkan panduan terpandu step-by-step di Level C.";
+            }
+
+            switchView('diagnosticResultView');
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        }
+
+        function startGroupMissions(e) {
+            e.preventDefault();
+            const groupName = document.getElementById('groupNameInput').value.trim();
+            const groupLevel = document.getElementById('groupLevelSelect').value;
+            const m1 = document.getElementById('member1Input').value.trim();
+            const m2 = document.getElementById('member2Input').value.trim();
+            const m3 = document.getElementById('member3Input').value.trim();
+            const m4 = document.getElementById('member4Input').value.trim();
+            const m5 = document.getElementById('member5Input').value.trim();
+
+            if (!groupName || !m1 || !m2 || !m3 || !m4) {
+                showNotify('Lengkapi Form', 'Nama Kelompok serta Anggota 1 hingga Anggota 4 wajib diisi.', 'fa-user-group', 'bg-purple-100 text-purple-600');
+                return;
+            }
+
+            currentGroup.name = groupName;
+            currentGroup.level = groupLevel;
+            currentGroup.members = [m1, m2, m3, m4];
+            if (m5) currentGroup.members.push(m5);
+            currentGroup.score = 0;
+            currentGroup.currentMissionIndex = 0;
+
+            document.getElementById('groupNameDisplay').textContent = currentGroup.name;
+            document.getElementById('groupLevelBadge').textContent = `LEVEL ${currentGroup.level}`;
+            document.getElementById('groupMembersDisplay').textContent = `Anggota Tim: ${currentGroup.members.join(', ')}`;
+            document.getElementById('groupCurrentScore').textContent = `0 Pts`;
+
+            switchView('groupMissionView');
+            renderCurrentMission();
+        }
+
+        function renderCurrentMission() {
+            const missions = groupMissionsData[currentGroup.level];
+            const mission = missions[currentGroup.currentMissionIndex];
+
+            document.getElementById('missionTag').textContent = `MISI ${currentGroup.currentMissionIndex + 1} DARI ${missions.length}`;
+
+            const container = document.getElementById('missionBodyContainer');
+            let optionsHtml = mission.options.map((opt, idx) => `
+                <label class="block p-4 rounded-xl border-2 border-slate-200 hover:border-sky-600 cursor-pointer bg-white transition">
+                    <div class="flex items-center gap-3">
+                        <input type="radio" name="missionAnswer" value="${idx}" class="w-4 h-4 text-sky-600">
+                        <span class="font-medium text-slate-800 text-xs sm:text-sm">${opt}</span>
+                    </div>
+                </label>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-xl">
+                        <h3 class="font-bold text-base sm:text-lg text-slate-800">${mission.title}</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">${mission.context}</p>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
+                        <p class="font-bold text-slate-800 text-xs sm:text-sm">${mission.question}</p>
+                        <div class="space-y-2">${optionsHtml}</div>
+                    </div>
+                </div>
+            `;
+
+            triggerMathJax();
+        }
+
+        function submitMissionAnswer() {
+            const selectedOpt = document.querySelector('input[name="missionAnswer"]:checked');
+            if (!selectedOpt) {
+                showNotify('Pilih Jawaban', 'Pilih salah satu jawaban diskusi tim sebelum mengirim.', 'fa-hand-pointer', 'bg-amber-100 text-amber-600');
+                return;
+            }
+
+            const answerVal = parseInt(selectedOpt.value);
+            const missions = groupMissionsData[currentGroup.level];
+            const mission = missions[currentGroup.currentMissionIndex];
+
+            if (answerVal === mission.correct) {
+                currentGroup.score += mission.pts;
+                document.getElementById('groupCurrentScore').textContent = `${currentGroup.score} Pts`;
+                showNotify('Jawaban Benar! (+100 Pts)', `Pembahasan Step-by-Step:\n${mission.explanation}`, 'fa-circle-check', 'bg-emerald-100 text-emerald-600');
+            } else {
+                showNotify('Jawaban Belum Tepat', `Pembahasan Step-by-Step:\n${mission.explanation}`, 'fa-triangle-exclamation', 'bg-amber-100 text-amber-600');
+            }
+
+            if (currentGroup.currentMissionIndex < missions.length - 1) {
+                currentGroup.currentMissionIndex++;
+                renderCurrentMission();
+            } else {
+                finishGroupMissions();
+            }
+        }
+
+        function finishGroupMissions() {
+            document.getElementById('certGroupName').textContent = currentGroup.name;
+            document.getElementById('certMembers').textContent = currentGroup.members.join(', ');
+            document.getElementById('certLevel').textContent = `Level ${currentGroup.level}`;
+            document.getElementById('certScore').textContent = `${currentGroup.score} / 300 Pts`;
+
+            const reflectionInput = document.getElementById('reflectionInput');
+            reflectionInput.addEventListener('input', () => {
+                document.getElementById('certReflectionDisplay').textContent = `"${reflectionInput.value || 'Saling membantu dan bermusyawarah dalam memecahkan masalah keuangan lokal.'}"`;
+            });
+
+            switchView('certificateView');
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+        }
+
+        function openSimulatorModal() {
+            document.getElementById('simulatorModal').classList.remove('hidden');
+            setTimeout(updateSimulatorCanvas, 50);
+        }
+
+        function closeSimulatorModal() {
+            document.getElementById('simulatorModal').classList.add('hidden');
+        }
+
+        function updateSimulatorCanvas() {
+            const M0 = parseFloat(document.getElementById('simModalInput').value) || 10000000;
+            const rate = (parseFloat(document.getElementById('simRateInput').value) || 10) / 100;
+            const years = Math.min(Math.max(parseInt(document.getElementById('simYearsInput').value) || 5, 1), 10);
+
+            const canvas = document.getElementById('simCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = (rect.height || 260) * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height || 260;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = 45;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+
+            let tunggalVals = [];
+            let majemukVals = [];
+
+            for (let t = 1; t <= years; t++) {
+                tunggalVals.push(M0 * (1 + rate * t));
+                majemukVals.push(M0 * Math.pow(1 + rate, t));
+            }
+
+            const maxVal = Math.max(...majemukVals, M0 * 1.2);
+
+            // Background grid lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+
+            // Draw Axes
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Render Bar Charts
+            const groupWidth = chartWidth / years;
+            const barWidth = Math.min(groupWidth * 0.35, 30);
+
+            for (let i = 0; i < years; i++) {
+                const groupX = padding + i * groupWidth + (groupWidth - barWidth * 2 - 4) / 2;
+
+                // Simple Interest (Sky Blue)
+                const hTunggal = (tunggalVals[i] / maxVal) * chartHeight;
+                ctx.fillStyle = '#0284c7';
+                ctx.fillRect(groupX, height - padding - hTunggal, barWidth, hTunggal);
+
+                // Compound Interest (Emerald Green)
+                const hMajemuk = (majemukVals[i] / maxVal) * chartHeight;
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(groupX + barWidth + 4, height - padding - hMajemuk, barWidth, hMajemuk);
+
+                // Axis Year Label
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Plus Jakarta Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Thn ${i + 1}`, groupX + barWidth, height - padding + 16);
+            }
+        }
+
+        function saveTeacherData(student) {
+            let data = JSON.parse(localStorage.getItem('teacherDiagData') || '[]');
+            data.push({
+                name: student.name,
+                score: student.score,
+                level: `Level ${student.level}`,
+                time: new Date().toLocaleString('id-ID')
+            });
+            localStorage.setItem('teacherDiagData', JSON.stringify(data));
+        }
+
+        function loadTeacherData() {
+            let data = JSON.parse(localStorage.getItem('teacherDiagData') || '[]');
+            const tbody = document.getElementById('teacherTableBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada data siswa yang mengambil tes pemahaman awal.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map((item, idx) => `
+                <tr class="border-b hover:bg-slate-50 transition">
+                    <td class="p-4 font-bold text-slate-500">${idx + 1}</td>
+                    <td class="p-4 font-semibold text-slate-800">${item.name}</td>
+                    <td class="p-4 font-bold text-sky-600">${item.score} / 5</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${item.level.includes('A') ? 'bg-emerald-100 text-emerald-800' : item.level.includes('B') ? 'bg-sky-100 text-sky-800' : 'bg-amber-100 text-amber-800'}">${item.level}</span></td>
+                    <td class="p-4 text-xs text-slate-400">${item.time}</td>
+                </tr>
+            `).join('');
+        }
+
+        function copyTeacherData() {
+            let data = JSON.parse(localStorage.getItem('teacherDiagData') || '[]');
+            if (data.length === 0) {
+                showNotify('Data Kosong', 'Belum ada data hasil tes siswa untuk disalin.', 'fa-circle-info');
+                return;
+            }
+
+            let text = "REKAPITULASI HASIL TES PEMAHAMAN AWAL BENDAHARA MALANG\n";
+            text += "No\tNama Siswa\tSkor\tLevel\tWaktu\n";
+            data.forEach((item, idx) => {
+                text += `${idx + 1}\t${item.name}\t${item.score}/5\t${item.level}\t${item.time}\n`;
+            });
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showNotify('Berhasil Disalin', 'Data rekapitulasi nilai siswa berhasil disalin ke clipboard!', 'fa-circle-check', 'bg-emerald-100 text-emerald-600');
+        }
+
+        function clearTeacherData() {
+            localStorage.removeItem('teacherDiagData');
+            loadTeacherData();
+            showNotify('Data Direset', 'Seluruh data rekapitulasi telah dibersihkan.', 'fa-trash-can', 'bg-red-100 text-red-600');
+        }
+
+        // Window Event Listeners
+        window.addEventListener('resize', () => {
+            const simModal = document.getElementById('simulatorModal');
+            if (simModal && !simModal.classList.contains('hidden')) {
+                updateSimulatorCanvas();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            triggerMathJax();
+        });
+    </script>
+</body>
+</html>
